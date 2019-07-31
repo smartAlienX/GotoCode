@@ -4,10 +4,14 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.util.SystemInfo;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Adb {
 
@@ -16,35 +20,41 @@ public class Adb {
     private static final String ADB_WINDOWS = "adb.exe";
     private static final String ADB_UNIX = "adb";
 
-    private String androidSdkPath = "C:\\Android\\SDK";
+    //    private String androidSdkPath ;
+//    private String androidSdkPath = "C:\\Android\\SDK";
+    private String androidSdkPath = "D:\\andoird\\SDK";
 
     public static void main(String[] args) throws IOException {
         //adb devices -l
-        Adb.getInstance().commend("logcat");
+        Adb.getInstance().runCommand("logcat", "*:I");
     }
 
     private Adb() {
 
     }
 
-    public void commend(String command) {
+    public void runCommand(String... command) {
+        Process commendProcess = getCommendProcess(command);
+        if(commendProcess != null){
+            commendProcess.destroy();
+        }
+    }
+
+    @Nullable
+    public Process getCommendProcess(String... command) {
         String adbPath = getAdbPath();
-        ProcessBuilder processBuilder = new ProcessBuilder(adbPath, command);
+        List<String> commandList = new ArrayList<String>();
+        commandList.add(adbPath);
+        commandList.addAll(Arrays.asList(command));
+        ProcessBuilder processBuilder = new ProcessBuilder(commandList);
         processBuilder.redirectErrorStream(true);
+
         try {
-            Process process = processBuilder.start();
-            InputStream inputStream = process.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            while (true) {
-                String line = bufferedReader.readLine();
-                System.out.println(line);
-                if (line == null) {
-                    return;
-                }
-            }
+            return processBuilder.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     public String getAndroidSdkPath() {
