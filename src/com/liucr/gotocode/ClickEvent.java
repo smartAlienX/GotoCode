@@ -40,4 +40,8 @@ public class ClickEvent {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return stackTraceElements.toString();
+    }
 }
