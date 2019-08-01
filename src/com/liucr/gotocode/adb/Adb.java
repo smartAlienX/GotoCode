@@ -21,8 +21,8 @@ public class Adb {
     private static final String ADB_UNIX = "adb";
 
     //    private String androidSdkPath ;
-    private String androidSdkPath = "C:\\Android\\SDK";
-//    private String androidSdkPath = "D:\\andoird\\SDK";
+//    private String androidSdkPath = "C:\\Android\\SDK";
+    private String androidSdkPath = "D:\\andoird\\SDK";
 
     public static void main(String[] args) throws IOException {
         //adb devices -l

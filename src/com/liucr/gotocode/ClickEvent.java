@@ -15,7 +15,7 @@ public class ClickEvent {
                 && s.contains(CLICK_EVENT)) {
             int start = s.indexOf("[");
             int end = s.lastIndexOf("]");
-            String infoString = s.substring(start, end);
+            String infoString = s.substring(start+1, end);
             String[] infoList = infoString.split(",");
             for (String info : infoList) {
                 StackTraceElement stackTraceElement = parseToStackTraceElement(info);
