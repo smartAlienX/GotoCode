@@ -1,48 +1,59 @@
-package com.liucr.gotocode;
+package com.liucr.gotocode.toolwindow;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.liucr.gotocode.adb.Adb;
+import com.liucr.gotocode.ClickEvent;
+import com.liucr.gotocode.ClickEventLogcat;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.*;
 
-public class GoToClickEventAction extends AnAction {
+public class GoToCodeWindow implements ClickEventLogcat.ClickEventListener {
 
-    public static void main(String[] args) throws IOException {
-        //adb devices -l
-        new GoToClickEventAction().actionPerformed(null);
-    }
+    public final String START = "Start";
+    public final String STOP = "Stop";
 
     private Project project;
-    private Process logcat;
-    private List<ClickEvent> clickEvents = new ArrayList<ClickEvent>();
 
-    @Override
-    public void actionPerformed(AnActionEvent e) {
-        // TODO: insert action logic here
-        project = e.getData(PlatformDataKeys.PROJECT);
-        ClickEventLogcat.getInstance().start();
-        ClickEventLogcat.getInstance().addClickEventListener(new ClickEventLogcat.ClickEventListener() {
-            @Override
-            public void onAddClickEvent(ClickEvent clickEvent) {
-                openFile(clickEvent);
-//                ClickEventLogcat.getInstance().removeClickEventListener(this);
+    private JPanel myToolWindowContent;
+    private JButton startButton;
+
+    public GoToCodeWindow(Project project, ToolWindow toolWindow) {
+        this.project = project;
+        ClickEventLogcat.getInstance().addClickEventListener(this);
+        initSwitchButton();
+    }
+
+    private void initSwitchButton() {
+        if (ClickEventLogcat.getInstance().isStrat()) {
+            startButton.setText(STOP);
+        } else {
+            startButton.setText(START);
+        }
+        startButton.addActionListener(e -> {
+            if (START.equals(startButton.getText())) {
+                ClickEventLogcat.getInstance().start();
+                startButton.setText(STOP);
+            } else {
+                ClickEventLogcat.getInstance().stop();
+                startButton.setText(START);
             }
         });
+    }
+
+    public JPanel getContent() {
+        return myToolWindowContent;
+    }
+
+    @Override
+    public void onAddClickEvent(ClickEvent clickEvent) {
+        openFile(clickEvent);
     }
 
     private void openFile(final ClickEvent clickEvent) {
@@ -67,5 +78,4 @@ public class GoToClickEventAction extends AnAction {
             });
         }
     }
-
 }

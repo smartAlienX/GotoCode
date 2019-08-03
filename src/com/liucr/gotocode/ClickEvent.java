@@ -9,13 +9,17 @@ public class ClickEvent {
 
     public List<StackTraceElement> stackTraceElements = new ArrayList<StackTraceElement>();
 
+    public void openFirstFile() {
+
+    }
+
     public static ClickEvent parse(String s) {
         ClickEvent clickEvent = new ClickEvent();
         if (s != null
                 && s.contains(CLICK_EVENT)) {
             int start = s.indexOf("[");
             int end = s.lastIndexOf("]");
-            String infoString = s.substring(start+1, end);
+            String infoString = s.substring(start + 1, end);
             String[] infoList = infoString.split(",");
             for (String info : infoList) {
                 StackTraceElement stackTraceElement = parseToStackTraceElement(info);

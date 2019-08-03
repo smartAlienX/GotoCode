@@ -26,17 +26,20 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+
+        <toolWindow id="GoToCodeWindow" anchor="right" factoryClass="com.liucr.gotocode.toolwindow.GoToCodeWindowFactory">
+
+        </toolWindow>
+
     </extensions>
 
     <actions>
         <!-- Add your actions here -->
-        <action id="GoToClickEventAction"
+        <action id="GoToClickEventAction.ID"
                 class="com.liucr.gotocode.GoToClickEventAction"
                 text="GoToClickEvent"
                 description="goto code">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <keyboard-shortcut keymap="$default"
-                               first-keystroke="control 1"/>
         </action>
     </actions>
 
