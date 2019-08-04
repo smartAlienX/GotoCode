@@ -1,16 +1,10 @@
 package com.liucr.gotocode.toolwindow;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.liucr.gotocode.ClickEvent;
 import com.liucr.gotocode.ClickEventLogcat;
+import com.liucr.gotocode.GoToFileUtil;
 
 import javax.swing.*;
 
@@ -22,32 +16,35 @@ public class GoToCodeWindow implements ClickEventLogcat.ClickEventListener {
     private Project project;
 
     private JPanel myToolWindowContent;
-    private JButton startButton;
+    private JTabbedPane tabbedPane;
+    private JPanel clickEventTab;
+    private JPanel curActivityTab;
+    private JButton clickEventSwitch;
 
     public GoToCodeWindow(Project project, ToolWindow toolWindow) {
         this.project = project;
-        ClickEventLogcat.getInstance().addClickEventListener(this);
         initSwitchButton();
+        ClickEventLogcat.getInstance().addClickEventListener(this);
     }
 
     private void initSwitchButton() {
         if (ClickEventLogcat.getInstance().isStrat()) {
-            startButton.setText(STOP);
+            clickEventSwitch.setText(STOP);
         } else {
-            startButton.setText(START);
+            clickEventSwitch.setText(START);
         }
-        startButton.addActionListener(e -> {
-            if (START.equals(startButton.getText())) {
+        clickEventSwitch.addActionListener(e -> {
+            if (START.equals(clickEventSwitch.getText())) {
                 ClickEventLogcat.getInstance().start();
-                startButton.setText(STOP);
+                clickEventSwitch.setText(STOP);
             } else {
                 ClickEventLogcat.getInstance().stop();
-                startButton.setText(START);
+                clickEventSwitch.setText(START);
             }
         });
     }
 
-    public JPanel getContent() {
+    public JComponent getContent() {
         return myToolWindowContent;
     }
 
@@ -57,25 +54,10 @@ public class GoToCodeWindow implements ClickEventLogcat.ClickEventListener {
     }
 
     private void openFile(final ClickEvent clickEvent) {
-        if (clickEvent.stackTraceElements.size() > 0) {
-            ApplicationManager.getApplication().invokeLater(new Runnable() {
-                public void run() {
-                    ApplicationManager.getApplication().runReadAction(new Runnable() {
-                        public void run() {
-                            StackTraceElement stackTraceElement = clickEvent.stackTraceElements.get(0);
-                            PsiClass psiClass = JavaPsiFacade.getInstance(project)
-                                    .findClass(stackTraceElement.getClassName(), GlobalSearchScope.allScope(project));
-                            PsiFile containingFile = null;
-                            if (psiClass != null) {
-                                containingFile = psiClass.getContainingFile();
-                                VirtualFile virtualFile = containingFile.getVirtualFile();
-                                OpenFileDescriptor openFileDescriptor = new OpenFileDescriptor(project, virtualFile, stackTraceElement.getLineNumber(), 10);
-                                openFileDescriptor.navigate(true);
-                            }
-                        }
-                    });
-                }
-            });
-        }
+        GoToFileUtil.openFile(project, clickEvent);
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 }
