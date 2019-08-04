@@ -33,11 +33,19 @@
                   <text value="Button"/>
                 </properties>
               </component>
-              <vspacer id="721dd">
+              <scrollpane id="668ef">
                 <constraints>
-                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
-              </vspacer>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="28b35" class="javax.swing.JList" binding="clickEventList">
+                    <constraints/>
+                    <properties/>
+                  </component>
+                </children>
+              </scrollpane>
             </children>
           </grid>
           <grid id="3dead" binding="curActivityTab" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

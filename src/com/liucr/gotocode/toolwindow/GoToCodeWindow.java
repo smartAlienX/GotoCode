@@ -7,6 +7,9 @@ import com.liucr.gotocode.ClickEventLogcat;
 import com.liucr.gotocode.GoToFileUtil;
 
 import javax.swing.*;
+import javax.swing.event.ListDataListener;
+import javax.swing.tree.TreePath;
+import java.awt.*;
 
 public class GoToCodeWindow implements ClickEventLogcat.ClickEventListener {
 
@@ -20,10 +23,15 @@ public class GoToCodeWindow implements ClickEventLogcat.ClickEventListener {
     private JPanel clickEventTab;
     private JPanel curActivityTab;
     private JButton clickEventSwitch;
+    private JList<ClickEvent> clickEventList;
+
+    private DefaultComboBoxModel<ClickEvent> clickEventData = new DefaultComboBoxModel<>();
 
     public GoToCodeWindow(Project project, ToolWindow toolWindow) {
         this.project = project;
+
         initSwitchButton();
+        initClickEventList();
         ClickEventLogcat.getInstance().addClickEventListener(this);
     }
 
@@ -44,6 +52,27 @@ public class GoToCodeWindow implements ClickEventLogcat.ClickEventListener {
         });
     }
 
+    private void initClickEventList() {
+        clickEventList.setModel(clickEventData);
+        clickEventList.setCellRenderer(new ListCellRenderer<ClickEvent>() {
+
+            @Override
+            public Component getListCellRendererComponent(JList<? extends ClickEvent> list,
+                                                          ClickEvent value,
+                                                          int index,
+                                                          boolean isSelected,
+                                                          boolean cellHasFocus) {
+
+                JButton jButton = new JButton();
+                if (value.stackTraceElements.size() > 0) {
+                    jButton.setText(value.stackTraceElements.get(0).getMethodName());
+                }
+
+                return jButton;
+            }
+        });
+    }
+
     public JComponent getContent() {
         return myToolWindowContent;
     }
@@ -51,6 +80,7 @@ public class GoToCodeWindow implements ClickEventLogcat.ClickEventListener {
     @Override
     public void onAddClickEvent(ClickEvent clickEvent) {
         openFile(clickEvent);
+        clickEventData.insertElementAt(clickEvent, 0);
     }
 
     private void openFile(final ClickEvent clickEvent) {
