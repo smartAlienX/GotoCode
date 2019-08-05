@@ -13,6 +13,14 @@ public class ClickEvent {
 
     }
 
+    public String getName() {
+        if (stackTraceElements.size() != 0) {
+            StackTraceElement stackTraceElement = stackTraceElements.get(0);
+            return stackTraceElement.getFileName() + " : " + stackTraceElement.getMethodName();
+        }
+        return "";
+    }
+
     public static ClickEvent parse(String s) {
         ClickEvent clickEvent = new ClickEvent();
         if (s != null
