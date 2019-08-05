@@ -37,7 +37,11 @@
                 <preferred-size width="150" height="50"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <dragEnabled value="false"/>
+              <focusable value="true"/>
+              <model/>
+            </properties>
           </component>
         </children>
       </grid>
