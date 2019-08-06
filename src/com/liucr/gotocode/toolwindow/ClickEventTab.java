@@ -7,6 +7,8 @@ import com.liucr.gotocode.GoToFileUtil;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ClickEventTab implements ClickEventLogcat.ClickEventListener {
 
@@ -56,10 +58,18 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener {
                                                           boolean isSelected,
                                                           boolean cellHasFocus) {
 
-
                 return new ClickEventItem(project, value).getComponent();
             }
         });
+
+//        clickEventList.setEnabled(false);
+//        clickEventList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        clickEventList.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                super.mouseClicked(e);
+//            }
+//        });
     }
 
     @Override

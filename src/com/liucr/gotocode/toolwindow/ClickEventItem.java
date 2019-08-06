@@ -19,6 +19,7 @@ public class ClickEventItem {
     private JPanel itemPanel;
     private JLabel itemName;
     private JList<StackTraceElement> childList;
+    private JButton button1;
 
     private ClickEvent clickEvent;
     private DefaultComboBoxModel<StackTraceElement> clickEventData = new DefaultComboBoxModel<>();
@@ -28,6 +29,21 @@ public class ClickEventItem {
         itemName.setText(clickEvent.getName());
         this.clickEvent = clickEvent;
         initClickEventList();
+
+        itemName.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                GoToFileUtil.openFile(project, clickEvent);
+            }
+        });
+
+        button1.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GoToFileUtil.openFile(project, clickEvent);
+            }
+        });
     }
 
 
@@ -46,6 +62,7 @@ public class ClickEventItem {
                                                           boolean cellHasFocus) {
                 JButton label = new JButton();
                 label.setText(value.getFileName() + " : " + value.getMethodName());
+                label.requestFocus();
                 label.addActionListener(new AbstractAction() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
