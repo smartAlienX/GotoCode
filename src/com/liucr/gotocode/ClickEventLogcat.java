@@ -1,6 +1,6 @@
 package com.liucr.gotocode;
 
-import com.google.common.eventbus.EventBus;
+import com.intellij.openapi.application.ApplicationManager;
 import com.liucr.gotocode.adb.Adb;
 
 import java.io.BufferedReader;
@@ -89,9 +89,11 @@ public class ClickEventLogcat {
         clickEventList.add(0, clickEvent);
         System.out.println(clickEvent.toString());
 
-        for (ClickEventListener eventListener : eventListeners) {
-            eventListener.onAddClickEvent(clickEvent);
-        }
+        ApplicationManager.getApplication().invokeLater(() -> {
+            for (ClickEventListener eventListener : eventListeners) {
+                eventListener.onAddClickEvent(clickEvent);
+            }
+        });
     }
 
     public interface ClickEventListener {

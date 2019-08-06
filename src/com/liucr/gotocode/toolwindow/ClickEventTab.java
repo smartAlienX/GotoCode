@@ -7,10 +7,9 @@ import com.liucr.gotocode.GoToFileUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
 
-public class ClickEventTab implements ClickEventLogcat.ClickEventListener {
+public class ClickEventTab implements ClickEventLogcat.ClickEventListener, ClickEventItem.OnClickEventItemRemove {
 
     public final String START = "Start";
     public final String STOP = "Stop";
@@ -19,7 +18,8 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener {
 
     private JPanel clickEventTab;
     private JButton clickEventSwitch;
-    private JList<ClickEvent> clickEventList;
+    private JPanel clickEventListPanel;
+    private JButton deleteAllButton;
 
     private DefaultComboBoxModel<ClickEvent> clickEventData = new DefaultComboBoxModel<>();
 
@@ -28,6 +28,13 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener {
         initSwitchButton();
         initClickEventList();
         ClickEventLogcat.getInstance().addClickEventListener(this);
+
+        deleteAllButton.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clickEventListPanel.removeAll();
+            }
+        });
     }
 
     private void initSwitchButton() {
@@ -45,37 +52,23 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener {
                 clickEventSwitch.setText(START);
             }
         });
+
     }
 
     private void initClickEventList() {
-        clickEventList.setModel(clickEventData);
-        clickEventList.setCellRenderer(new ListCellRenderer<ClickEvent>() {
-
-            @Override
-            public Component getListCellRendererComponent(JList<? extends ClickEvent> list,
-                                                          ClickEvent value,
-                                                          int index,
-                                                          boolean isSelected,
-                                                          boolean cellHasFocus) {
-
-                return new ClickEventItem(project, value).getComponent();
-            }
-        });
-
-//        clickEventList.setEnabled(false);
-//        clickEventList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        clickEventList.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                super.mouseClicked(e);
-//            }
-//        });
+        GridLayout gridLayout = new GridLayout(0, 1);
+        clickEventListPanel.setLayout(gridLayout);
     }
 
     @Override
     public void onAddClickEvent(ClickEvent clickEvent) {
         openFile(clickEvent);
-        clickEventData.insertElementAt(clickEvent, 0);
+        clickEventListPanel.add(new ClickEventItem(project, clickEvent, this).getComponent(), 0);
+    }
+
+    @Override
+    public void remove(ClickEventItem clickEventItem) {
+        clickEventListPanel.remove(clickEventItem.getComponent());
     }
 
     private void openFile(final ClickEvent clickEvent) {
@@ -85,4 +78,6 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener {
     public Component getComponent() {
         return clickEventTab;
     }
+
+
 }

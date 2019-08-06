@@ -19,12 +19,12 @@ public class ClickEventItem {
     private JPanel itemPanel;
     private JLabel itemName;
     private JList<StackTraceElement> childList;
-    private JButton button1;
+    private JButton deleteButton;
 
     private ClickEvent clickEvent;
     private DefaultComboBoxModel<StackTraceElement> clickEventData = new DefaultComboBoxModel<>();
 
-    public ClickEventItem(Project project, ClickEvent clickEvent) {
+    public ClickEventItem(Project project, ClickEvent clickEvent, OnClickEventItemRemove itemRemove) {
         this.project = project;
         itemName.setText(clickEvent.getName());
         this.clickEvent = clickEvent;
@@ -38,14 +38,13 @@ public class ClickEventItem {
             }
         });
 
-        button1.addActionListener(new AbstractAction() {
+        deleteButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GoToFileUtil.openFile(project, clickEvent);
+                itemRemove.remove(ClickEventItem.this);
             }
         });
     }
-
 
     private void initClickEventList() {
         for (StackTraceElement element : clickEvent.stackTraceElements) {
@@ -60,15 +59,9 @@ public class ClickEventItem {
                                                           int index,
                                                           boolean isSelected,
                                                           boolean cellHasFocus) {
-                JButton label = new JButton();
+                JLabel label = new JLabel();
                 label.setText(value.getFileName() + " : " + value.getMethodName());
                 label.requestFocus();
-                label.addActionListener(new AbstractAction() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        GoToFileUtil.openFile(project, value);
-                    }
-                });
                 return label;
             }
         });
@@ -88,5 +81,7 @@ public class ClickEventItem {
         return itemPanel;
     }
 
-
+    public interface OnClickEventItemRemove {
+        void remove(ClickEventItem clickEventItem);
+    }
 }
