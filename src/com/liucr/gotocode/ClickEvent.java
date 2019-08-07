@@ -16,7 +16,9 @@ public class ClickEvent {
     public String getName() {
         if (stackTraceElements.size() != 0) {
             StackTraceElement stackTraceElement = stackTraceElements.get(0);
-            return stackTraceElement.getFileName() + " : " + stackTraceElement.getMethodName();
+            return stackTraceElement.getFileName()
+                    + "(" + stackTraceElement.getLineNumber() + ")"
+                    + ":" + stackTraceElement.getMethodName() + "()";
         }
         return "";
     }
@@ -32,7 +34,7 @@ public class ClickEvent {
             for (String info : infoList) {
                 StackTraceElement stackTraceElement = parseToStackTraceElement(info);
                 if (stackTraceElement != null) {
-                    clickEvent.stackTraceElements.add(stackTraceElement);
+                    clickEvent.stackTraceElements.add(0,stackTraceElement);
                 }
             }
         }

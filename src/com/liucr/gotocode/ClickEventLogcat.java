@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.liucr.gotocode.adb.Adb;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -23,6 +24,8 @@ public class ClickEventLogcat {
     private List<ClickEventListener> eventListeners = new ArrayList<>();
     private List<ClickEvent> clickEventList = new ArrayList<>();
 
+    private Adb.Device targetDevice;
+
     private ClickEventLogcat() {
 
     }
@@ -34,7 +37,12 @@ public class ClickEventLogcat {
         }
 
         if (logcatProcess == null || logcatProcess.isAlive()) {
-            logcatProcess = Adb.getInstance().getCommendProcess("logcat", "ClickEvent:D", "*:S");
+            if (targetDevice == null) {
+                logcatProcess = Adb.getInstance().getCommendProcess("logcat", "ClickEvent:D", "*:S");
+            } else {
+                logcatProcess = Adb.getInstance()
+                        .getCommendProcess("-s", targetDevice.deviceNumber, "logcat", "ClickEvent:D", "*:S");
+            }
         }
 
         if (logcatProcess == null) {
@@ -44,6 +52,7 @@ public class ClickEventLogcat {
         InputStream inputStream = logcatProcess.getInputStream();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         logcatRun = true;
+        long time = System.currentTimeMillis();
         executor.execute(new Runnable() {
             @Override
             public void run() {
@@ -54,11 +63,18 @@ public class ClickEventLogcat {
                             return;
                         }
                         System.out.println(this + "  >>  " + line);
-                        parseLogcat(line);
+                        if (System.currentTimeMillis() - time > 2000) {
+                            parseLogcat(line);
+                        }
                     }
-                    bufferedReader.close();
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    try {
+                        bufferedReader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -68,7 +84,7 @@ public class ClickEventLogcat {
         logcatRun = false;
     }
 
-    public boolean isStrat() {
+    public boolean isStart() {
         return logcatRun;
     }
 
@@ -82,6 +98,10 @@ public class ClickEventLogcat {
 
     public void removeClickEventListener(ClickEventListener clickEventListener) {
         eventListeners.remove(clickEventListener);
+    }
+
+    public void setTargetDevice(Adb.Device targetDevice) {
+        this.targetDevice = targetDevice;
     }
 
     private void parseLogcat(String line) {

@@ -60,7 +60,7 @@ public class ClickEventItem {
                                                           boolean isSelected,
                                                           boolean cellHasFocus) {
                 JLabel label = new JLabel();
-                label.setText(value.getFileName() + " : " + value.getMethodName());
+                label.setText(value.getFileName() + "(" + value.getLineNumber() + ")" + ":" + value.getMethodName() + "()");
                 label.requestFocus();
                 return label;
             }

@@ -38,7 +38,7 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener, Click
     }
 
     private void initSwitchButton() {
-        if (ClickEventLogcat.getInstance().isStrat()) {
+        if (ClickEventLogcat.getInstance().isStart()) {
             clickEventSwitch.setText(STOP);
         } else {
             clickEventSwitch.setText(START);

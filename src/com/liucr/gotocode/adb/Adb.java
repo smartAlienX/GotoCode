@@ -26,16 +26,52 @@ public class Adb {
 
     public static void main(String[] args) throws IOException {
         //adb devices -l
-        Adb.getInstance().runCommand("logcat", "*:I");
+//        Adb.getInstance().runCommand("logcat", "*:I");
+        List<Device> deviceList = Adb.getInstance().getDeviceList();
+        System.out.println(deviceList.toString());
     }
 
     private Adb() {
 
     }
 
+
+    /**
+     * 获取当前连接的设备
+     */
+    public List<Device> getDeviceList() {
+
+        List<Device> deviceList = new ArrayList<>();
+
+        Process logcatProcess = getCommendProcess("devices", "-l");
+        if (logcatProcess == null) {
+            return new ArrayList<>();
+        }
+        InputStream inputStream = logcatProcess.getInputStream();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+        try {
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null) {
+                System.out.println(line);
+                if (line.contains("product") && line.contains("model")) {
+                    Device device = new Device();
+                    device.deviceNumber = line.substring(0, line.indexOf(" "));
+                    String text = line.substring(line.indexOf("model:"));
+                    device.name = text.substring(6, text.indexOf(" device"));
+                    deviceList.add(device);
+                }
+            }
+//            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return deviceList;
+    }
+
     public void runCommand(String... command) {
         Process commendProcess = getCommendProcess(command);
-        if(commendProcess != null){
+        if (commendProcess != null) {
             commendProcess.destroy();
         }
     }
@@ -89,5 +125,18 @@ public class Adb {
 
     public static Adb getInstance() {
         return LazyHolder.INSTANCE;
+    }
+
+
+    public static class Device {
+
+        public String name;
+
+        public String deviceNumber;
+
+        @Override
+        public String toString() {
+            return name + " : " + deviceNumber;
+        }
     }
 }
