@@ -3,6 +3,7 @@ package com.liucr.gotocode.toolwindow;
 import com.intellij.openapi.project.Project;
 import com.liucr.gotocode.ClickEvent;
 import com.liucr.gotocode.ClickEventLogcat;
+import com.liucr.gotocode.Config;
 import com.liucr.gotocode.GoToFileUtil;
 
 import javax.swing.*;
@@ -20,6 +21,7 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener, Click
     private JButton clickEventSwitch;
     private JPanel clickEventListPanel;
     private JButton deleteAllButton;
+    private JScrollPane jScrollPane;
 
     private DefaultComboBoxModel<ClickEvent> clickEventData = new DefaultComboBoxModel<>();
 
@@ -35,6 +37,8 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener, Click
                 clickEventListPanel.removeAll();
             }
         });
+
+        jScrollPane.getVerticalScrollBar().setUnitIncrement(80);
     }
 
     private void initSwitchButton() {
@@ -62,8 +66,11 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener, Click
 
     @Override
     public void onAddClickEvent(ClickEvent clickEvent) {
-        openFile(clickEvent);
         clickEventListPanel.add(new ClickEventItem(project, clickEvent, this).getComponent(), 0);
+        clickEventListPanel.updateUI();
+        if (Config.getInstance().isOpenFileByClick()) {
+            openFile(clickEvent);
+        }
     }
 
     @Override
@@ -78,6 +85,4 @@ public class ClickEventTab implements ClickEventLogcat.ClickEventListener, Click
     public Component getComponent() {
         return clickEventTab;
     }
-
-
 }

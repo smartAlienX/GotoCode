@@ -108,11 +108,11 @@ public class ClickEventLogcat {
         ClickEvent clickEvent = ClickEvent.parse(line);
         clickEventList.add(0, clickEvent);
         System.out.println(clickEvent.toString());
-
         ApplicationManager.getApplication().invokeLater(() -> {
             for (ClickEventListener eventListener : eventListeners) {
                 eventListener.onAddClickEvent(clickEvent);
             }
+            System.out.println("invokeLater onAddClickEvent");
         });
     }
 
