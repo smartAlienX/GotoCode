@@ -106,6 +106,9 @@ public class ClickEventLogcat {
 
     private void parseLogcat(String line) {
         ClickEvent clickEvent = ClickEvent.parse(line);
+        if (clickEvent == null) {
+            return;
+        }
         clickEventList.add(0, clickEvent);
         System.out.println(clickEvent.toString());
         ApplicationManager.getApplication().invokeLater(() -> {

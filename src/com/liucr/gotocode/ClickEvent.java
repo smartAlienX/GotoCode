@@ -24,9 +24,11 @@ public class ClickEvent {
     }
 
     public static ClickEvent parse(String s) {
-        ClickEvent clickEvent = new ClickEvent();
         if (s != null
-                && s.contains(CLICK_EVENT)) {
+                && s.contains(CLICK_EVENT)
+                && s.contains("[")
+                && s.contains("]")) {
+            ClickEvent clickEvent = new ClickEvent();
             int start = s.indexOf("[");
             int end = s.lastIndexOf("]");
             String infoString = s.substring(start + 1, end);
@@ -34,11 +36,12 @@ public class ClickEvent {
             for (String info : infoList) {
                 StackTraceElement stackTraceElement = parseToStackTraceElement(info);
                 if (stackTraceElement != null) {
-                    clickEvent.stackTraceElements.add(0,stackTraceElement);
+                    clickEvent.stackTraceElements.add(0, stackTraceElement);
                 }
             }
+            return clickEvent;
         }
-        return clickEvent;
+        return null;
     }
 
     public static StackTraceElement parseToStackTraceElement(String s) {
