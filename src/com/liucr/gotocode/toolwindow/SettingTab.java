@@ -1,7 +1,9 @@
 package com.liucr.gotocode.toolwindow;
 
 import com.intellij.openapi.project.Project;
+import com.liucr.gotocode.ClickEventLogcat;
 import com.liucr.gotocode.Config;
+import com.liucr.gotocode.Log;
 import com.liucr.gotocode.adb.Adb;
 
 import javax.swing.*;
@@ -21,6 +23,11 @@ public class SettingTab {
     public SettingTab(Project project) {
         this.project = project;
 
+        openFileByClickSetting();
+        deviceListSetting();
+    }
+
+    private void openFileByClickSetting() {
         openFileByClickCheckBox.setSelected(Config.getInstance().isOpenFileByClick());
         openFileByClickCheckBox.addActionListener(new AbstractAction() {
             @Override
@@ -28,33 +35,42 @@ public class SettingTab {
                 Config.getInstance().setOpenFileByClick(openFileByClickCheckBox.isSelected());
             }
         });
+    }
 
+    private void deviceListSetting() {
         refreshButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                getDeviceList();
+                setDeviceListData();
             }
         });
 
         GridLayout gridLayout = new GridLayout(0, 1);
         deviceListPanel.setLayout(gridLayout);
-        getDeviceList();
+        setDeviceListData();
     }
 
-    private void getDeviceList() {
+    private void setDeviceListData() {
         List<Adb.Device> deviceList = Adb.getInstance().getDeviceList();
         deviceListPanel.removeAll();
         ButtonGroup buttonGroup = new ButtonGroup();
+        String curTargetDevice = Config.getInstance().getLogcatTargetDevice();
         for (Adb.Device device : deviceList) {
             JRadioButton jRadioButton = new JRadioButton();
             jRadioButton.setText(device.name + " : " + device.deviceNumber);
             deviceListPanel.add(jRadioButton);
             buttonGroup.add(jRadioButton);
 
+            if (device.deviceNumber.equals(curTargetDevice)) {
+                jRadioButton.setSelected(true);
+            } else {
+                jRadioButton.setSelected(false);
+            }
+
             jRadioButton.addActionListener(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    System.out.println(device.toString());
+                    Config.getInstance().setLogcatTargetDevice(device.deviceNumber);
                 }
             });
         }

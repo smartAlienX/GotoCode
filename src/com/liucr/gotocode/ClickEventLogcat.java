@@ -13,21 +13,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class ClickEventLogcat {
+public class ClickEventLogcat implements Config.UpdateListener {
 
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>());
     private Process logcatProcess;
+    private BufferedReader bufferedReader;
     private boolean logcatRun = false;
 
     private List<ClickEventListener> eventListeners = new ArrayList<>();
     private List<ClickEvent> clickEventList = new ArrayList<>();
 
-    private Adb.Device targetDevice;
-
     private ClickEventLogcat() {
-
+        Config.getInstance().addUpdateListener(this);
     }
 
     public void start() {
@@ -37,11 +36,12 @@ public class ClickEventLogcat {
         }
 
         if (logcatProcess == null || logcatProcess.isAlive()) {
-            if (targetDevice == null) {
+            String targetDeviceId = Config.getInstance().getLogcatTargetDevice();
+            if (targetDeviceId == null) {
                 logcatProcess = Adb.getInstance().getCommendProcess("logcat", "ClickEvent:D", "*:S");
             } else {
                 logcatProcess = Adb.getInstance()
-                        .getCommendProcess("-s", targetDevice.deviceNumber, "logcat", "ClickEvent:D", "*:S");
+                        .getCommendProcess("-s", targetDeviceId, "logcat", "ClickEvent:D", "*:S");
             }
         }
 
@@ -50,7 +50,7 @@ public class ClickEventLogcat {
         }
 
         InputStream inputStream = logcatProcess.getInputStream();
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         logcatRun = true;
         long time = System.currentTimeMillis();
         executor.execute(new Runnable() {
@@ -72,6 +72,10 @@ public class ClickEventLogcat {
                 } finally {
                     try {
                         bufferedReader.close();
+                        logcatProcess.destroy();
+                        logcatProcess = null;
+                        bufferedReader = null;
+                        logcatRun = false;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -82,6 +86,18 @@ public class ClickEventLogcat {
 
     public void stop() {
         logcatRun = false;
+        if (bufferedReader != null) {
+            try {
+                bufferedReader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            bufferedReader = null;
+        }
+        if (logcatProcess != null) {
+            logcatProcess.destroy();
+            logcatProcess = null;
+        }
     }
 
     public boolean isStart() {
@@ -100,10 +116,6 @@ public class ClickEventLogcat {
         eventListeners.remove(clickEventListener);
     }
 
-    public void setTargetDevice(Adb.Device targetDevice) {
-        this.targetDevice = targetDevice;
-    }
-
     private void parseLogcat(String line) {
         ClickEvent clickEvent = ClickEvent.parse(line);
         if (clickEvent == null) {
@@ -117,6 +129,13 @@ public class ClickEventLogcat {
             }
             System.out.println("invokeLater onAddClickEvent");
         });
+    }
+
+    @Override
+    public void onConfigUpdate(String configName, Object configValue) {
+        if (configName.equals(Config.LOGCAT_TARGET_DEVICE)) {
+
+        }
     }
 
     public interface ClickEventListener {
