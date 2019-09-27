@@ -17,6 +17,7 @@ public class GoToCodeWindow {
 
     public GoToCodeWindow(Project project, ToolWindow toolWindow) {
         this.project = project;
+        tabbedPane.add("Activity",new GoToActivityTab(project).getComponent());
         tabbedPane.add("ClickEvent",new ClickEventTab(project).getComponent());
         tabbedPane.add("Setting",new SettingTab(project).getComponent());
     }
