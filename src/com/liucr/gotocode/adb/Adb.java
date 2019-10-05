@@ -21,8 +21,8 @@ public class Adb {
     private static final String ADB_UNIX = "adb";
 
 //        private String androidSdkPath ;
-//    private String androidSdkPath = "C:\\Android\\SDK";
-    private String androidSdkPath = "D:\\andoird\\SDK";
+    private String androidSdkPath = "C:\\Android\\SDK";
+//    private String androidSdkPath = "D:\\andoird\\SDK";
 
     public static void main(String[] args) throws IOException {
         //adb devices -l
@@ -34,7 +34,6 @@ public class Adb {
     private Adb() {
 
     }
-
 
     /**
      * 获取当前连接的设备
@@ -93,7 +92,7 @@ public class Adb {
         return null;
     }
 
-    public String getAndroidSdkPath() {
+    private String getAndroidSdkPath() {
         if (androidSdkPath == null) {
             Sdk[] allJdks = ProjectJdkTable.getInstance().getAllJdks();
             for (Sdk jdk : allJdks) {
@@ -106,7 +105,7 @@ public class Adb {
         return androidSdkPath;
     }
 
-    public String getAdbPath() {
+    private String getAdbPath() {
         String androidSdkPath = getAndroidSdkPath();
         String adb = SystemInfo.isWindows ? ADB_WINDOWS : ADB_UNIX;
         return androidSdkPath + ADB_SUBPATH + adb;

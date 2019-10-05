@@ -12,11 +12,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-public class GoToActivityTab extends BaseTab {
+public class GoToActivityTab extends BaseTab implements ActivityInformationTool.ActivityInformationCallback {
 
     private JPanel content;
     private JButton getTheCurrentActivityButton;
     private JLabel currentActivity;
+    private JLabel activityLayout;
     private JLabel currentFragment;
     private JPanel fragmentListPanel;
 
@@ -32,8 +33,7 @@ public class GoToActivityTab extends BaseTab {
         getTheCurrentActivityButton.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                activityInformation = ActivityInformationTool.getActivityInformation();
-                update();
+                ActivityInformationTool.getActivityInformation(project, GoToActivityTab.this);
             }
         });
 
@@ -43,6 +43,19 @@ public class GoToActivityTab extends BaseTab {
                 super.mouseClicked(e);
                 if (activityInformation != null) {
                     String name = activityInformation.getName();
+                    GoToFileUtil.openFile(project, name);
+                }
+            }
+        });
+
+        activityLayout.addMouseListener(new FocusMouseAdapter(activityLayout) {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                if (activityInformation != null) {
+                    String name = activityInformation.getLayoutName();
+                    int start = name.lastIndexOf(".") + 1;
+                    name = name.substring(start);
                     GoToFileUtil.openFile(project, name);
                 }
             }
@@ -66,6 +79,7 @@ public class GoToActivityTab extends BaseTab {
             return;
         }
         currentActivity.setText(activityInformation.getSimpleName());
+        activityLayout.setText(activityInformation.getLayoutName());
 
         if (activityInformation.getCurFragmentInformation() != null) {
             currentFragment.setText(activityInformation.getCurFragmentInformation().getSimpleName());
@@ -95,7 +109,13 @@ public class GoToActivityTab extends BaseTab {
         return content;
     }
 
-    public class FocusMouseAdapter extends MouseAdapter{
+    @Override
+    public void onActivityInformation(ActivityInformation activityInformation) {
+        this.activityInformation = activityInformation;
+        update();
+    }
+
+    public class FocusMouseAdapter extends MouseAdapter {
 
         private JLabel jLabel;
         private Color color;

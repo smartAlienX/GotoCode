@@ -46,6 +46,9 @@ public class GoToFileUtil {
                         if (filesByName.length == 0) {
                             filesByName = PsiShortNamesCache.getInstance(project).getFilesByName(className + ".kt");
                         }
+                        if (filesByName.length == 0) {
+                            filesByName = PsiShortNamesCache.getInstance(project).getFilesByName(className + ".xml");
+                        }
                         if (filesByName.length > 0) {
                             containingFile = filesByName[0];
                         }
